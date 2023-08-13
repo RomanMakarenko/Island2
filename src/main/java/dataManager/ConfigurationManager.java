@@ -14,7 +14,7 @@ public class ConfigurationManager {
 
     private static Map<String, JsonNode> configCache = new HashMap<>();
 
-    public static JsonNode getConfigNode(String organismType) {
+    public JsonNode getConfigNode(String organismType) {
         if (configCache.containsKey(organismType)) {
             return configCache.get(organismType);
         } else {

@@ -2,5 +2,23 @@
   {
     "type": "grass",
     "weight": 1.0,
-    "maxPopulationSize": 200
+    "maxPopulationSize": 200,
+    "chanceForLoot": {
+      "wolf": 0,
+      "boa": 0,
+      "fox": 0,
+      "bear": 0,
+      "eagle": 0,
+      "horse": 0,
+      "deer": 0,
+      "rabbit": 0,
+      "mouse": 0,
+      "goat": 0,
+      "sheep": 0,
+      "hog": 0,
+      "buffalo": 0,
+      "duck": 0,
+      "caterpillar": 0,
+      "plants": 0
+    }
   }

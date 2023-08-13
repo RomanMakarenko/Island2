@@ -21,9 +21,11 @@ public class Island {
                 Point currentPoint = new Point(i, j);
                 ArrayList<Organism> organismsAtPoint = new ArrayList<>();
                 for (Organism organism: organismList) {
-                   int randomNumber = ThreadLocalRandom.current().nextInt(MIN_ORGANISM_POPULATION, organism.getMaxPopulationSize());
-                   System.out.println(randomNumber);
-                    for (int k = 0; k < randomNumber; k++) {
+                   int organismPopulationOnPoint = ThreadLocalRandom.current().nextInt(
+                           MIN_ORGANISM_POPULATION,
+                           organism.getMaxPopulationSize()
+                   );
+                    for (int k = 0; k < organismPopulationOnPoint; k++) {
                         organismsAtPoint.add(organism.createClone());
                     }
                 }
