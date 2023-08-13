@@ -1,0 +1,24 @@
+{
+  "weight": 700.0,
+  "maxPopulationSize": 100,
+  "maxSpeed": 3,
+  "mealSize": 100.0,
+  "chanceForLoot": {
+    "wolf": 0,
+    "boa": 0,
+    "fox": 0,
+    "bear": 0,
+    "eagle": 0,
+    "horse": 0,
+    "deer": 0,
+    "rabbit": 0,
+    "mouse": 0,
+    "goat": 0,
+    "sheep": 0,
+    "hog": 0,
+    "buffalo": 0,
+    "duck": 0,
+    "caterpillar": 0,
+    "plants": 100
+  }
+}
