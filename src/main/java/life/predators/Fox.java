@@ -2,9 +2,9 @@ package life.predators;
 
 import annotations.Life;
 import life.Organism;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 @Life
 public class Fox extends Predator {
     private final String ORGANISM_TYPE = "fox";

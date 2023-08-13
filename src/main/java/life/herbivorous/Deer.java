@@ -1,19 +1,20 @@
-package life.predators;
+package life.herbivorous;
 
 import annotations.Life;
 import life.Organism;
 import lombok.Data;
 
-@Life
 @Data
-public class Wolf extends Predator {
-    private final String ORGANISM_TYPE = "wolf";
-    public Wolf() {
+@Life
+public class Deer extends Herbivorous {
+    private final String ORGANISM_TYPE = "deer";
+
+    public Deer() {
         loadConfig(ORGANISM_TYPE);
     }
 
     @Override
     public Organism createClone() {
-        return new Wolf();
+        return new Deer();
     }
 }
