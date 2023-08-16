@@ -5,6 +5,8 @@ import life.Organism;
 import life.plants.Grass;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class World {
     private final int WIDTH = 100;
@@ -21,41 +23,47 @@ public class World {
             Point point = entry.getKey();
             ArrayList<Organism> organisms = entry.getValue();
             Collections.shuffle(organisms);
-            for (Organism organism : organisms) {
-                Animal animal = getAnimalType(organism);
-                if (animal != null && animal.isAlive()) {
-                    organisms = eat(animal, organisms);
-                }
-            }
-            System.out.println();
+            ArrayList<Animal> animals = getAnimalsOnPoint(organisms);
+            eatAction(organisms, animals);
+            animals = getAnimalsOnPoint(organisms);
+            pairAction(organisms, animals);
         }
 
-        pair();
         move();
+
     }
 
-    private Animal getAnimalType(Organism organism) {
-        if (organism instanceof Animal) {
-            return (Animal) organism;
-        }
-        return null;
-    }
-
-    private ArrayList<Organism> eat(Animal animal, ArrayList<Organism> organismsOnPoint) {
-        List<String> potentialFoodListInIteration = animal.getPotentialIterationFoodList();
-        potentialFoodListInIteration.stream().forEach(food -> {
-            for (Organism organism : organismsOnPoint) {
-                if (organism.getORGANISM_TYPE().equals(food) && organism.isAlive()) {
-                    organism.setAlive(false);
-                    break;
-                }
-            }
+    private void pairAction(ArrayList<Organism> organisms, ArrayList<Animal> animals) {
+        animals.forEach(animal -> {
+            animal.pair(animals);
+            ArrayList<Animal> newCreatedAnimals = animal.pair(animals);
+            organisms.addAll(newCreatedAnimals);
         });
-        return organismsOnPoint;
     }
 
-    private void pair() {
+    private void eatAction(ArrayList<Organism> organisms, ArrayList<Animal> animals) {
+        animals.forEach(animal -> {
+            animal.eat(organisms);
+        });
+        cleanDeadOrganism(organisms);
+    }
 
+    private ArrayList<Animal> getAnimalsOnPoint(ArrayList<Organism> organisms) {
+        return organisms.stream()
+                .filter(currentOrganism -> currentOrganism instanceof Animal)
+                .map(currentOrganism -> (Animal) currentOrganism)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private ArrayList<Organism> cleanDeadOrganism(ArrayList<Organism> organismsOnPoint) {
+        Iterator<Organism> iterator = organismsOnPoint.iterator();
+        while (iterator.hasNext()) {
+            Organism organism = iterator.next();
+            if (!organism.isAlive()) {
+                iterator.remove();
+            }
+        }
+        return organismsOnPoint;
     }
 
     private void move() {
