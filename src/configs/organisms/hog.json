@@ -3,6 +3,7 @@
   "maxPopulationSize": 50,
   "maxSpeed": 2,
   "mealSize": 50.0,
+  "chanceForPairing": 40,
   "chanceForLoot": {
     "wolf": 0,
     "boa": 0,
