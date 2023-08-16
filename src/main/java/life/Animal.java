@@ -2,9 +2,12 @@ package life;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import dataManager.ConfigurationManager;
+import life.behavior.Direction;
 import life.behavior.Eating;
 import life.behavior.Moving;
 import life.behavior.Pairing;
+import life.world.Point;
+import life.world.World;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +19,6 @@ import java.util.concurrent.ThreadLocalRandom;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public abstract class Animal extends Organism implements Eating, Moving, Pairing {
-    protected int xAfterMove;
-    protected int yAfterMove;
     protected int maxSpeed;
     protected double mealSize;
     protected double eatenSize;
@@ -90,5 +91,45 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
                 0,
                 100
         ) <= this.getChanceForPairing();
+    }
+
+    @Override
+    public void move(Point point) {
+        int distance = ThreadLocalRandom.current().nextInt(0, this.getMaxSpeed());
+        Point destinationPoint = new Point(point.getX(), point.getY());
+        while (distance > 0) {
+            Direction currentDirection = Direction.getRandomDirection();
+            if (isValidMove(destinationPoint, currentDirection)) {
+                switch (currentDirection) {
+                    case DOWN:
+                        destinationPoint.setY(destinationPoint.getY() - 1);
+                        break;
+                    case RIGHT:
+                        destinationPoint.setX(destinationPoint.getX() + 1);
+                        break;
+                    case UP:
+                        destinationPoint.setY(destinationPoint.getY() + 1);
+                        break;
+                    case LEFT:
+                        destinationPoint.setX(destinationPoint.getX() - 1);
+                        break;
+                }
+                distance--;
+            }
+        }
+        this.setXAfterMove(destinationPoint.getX());
+        this.setYAfterMove(destinationPoint.getY());
+    }
+
+    private boolean isValidMove(Point point, Direction move) {
+        if (
+                (point.getX() == 0 && move == Direction.LEFT)
+                || (point.getX() == World.WIDTH - 1 && move == Direction.RIGHT)
+                || (point.getY() == 0 && move == Direction.DOWN)
+                || (point.getY() == World.HEIGHT - 1 && move == Direction.UP)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

@@ -2,12 +2,12 @@ package life.plants;
 
 import annotations.Life;
 import life.Organism;
-import life.Plants;
+import life.Plant;
 import lombok.Data;
 
 @Life
 @Data
-public class Grass extends Plants {
+public class Grass extends Plant {
     private final String ORGANISM_TYPE = "grass";
 
     public Grass() {
