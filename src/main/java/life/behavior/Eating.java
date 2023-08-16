@@ -1,5 +1,9 @@
 package life.behavior;
 
+import life.Organism;
+
+import java.util.ArrayList;
+
 public interface Eating {
-    public void eat();
+    public ArrayList<Organism> eat(ArrayList<Organism> organismsOnPoint);
 }

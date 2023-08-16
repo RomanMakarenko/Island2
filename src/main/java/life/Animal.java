@@ -16,6 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public abstract class Animal extends Organism implements Eating, Moving, Pairing {
+    protected int xAfterMove;
+    protected int yAfterMove;
     protected int maxSpeed;
     protected double mealSize;
     protected double eatenSize;
