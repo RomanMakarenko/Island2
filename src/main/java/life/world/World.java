@@ -2,15 +2,14 @@ package life.world;
 
 import life.Animal;
 import life.Organism;
-import life.behavior.Direction;
+import life.Plant;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class World {
-    private final int WIDTH = 100;
-    private final int HEIGHT = 20;
+    public static final int WIDTH = 100;
+    public static final int HEIGHT = 20;
     private HashMap<Point, ArrayList<Organism>> islandMap;
 
     public World() {
@@ -28,50 +27,23 @@ public class World {
             animals = getAnimalsOnPoint(organisms);
             pairAction(organisms, animals);
             animals = getAnimalsOnPoint(organisms);
-            animals.forEach(animal -> {
-                int distance = ThreadLocalRandom.current().nextInt(0, animal.getMaxSpeed());
-                Point destinationPoint = new Point(point.getX(), point.getY());
-                while (distance > 0) {
-                    Direction currentDirection = Direction.getRandomDirection();
-                    if (isValidMove(destinationPoint, currentDirection)) {
-                        switch (currentDirection) {
-                            case DOWN:
-                                destinationPoint.setY(destinationPoint.getY() - 1);
-                                break;
-                            case RIGHT:
-                                destinationPoint.setX(destinationPoint.getX() + 1);
-                                break;
-                            case UP:
-                                destinationPoint.setY(destinationPoint.getY() + 1);
-                                break;
-                            case LEFT:
-                                destinationPoint.setX(destinationPoint.getX() - 1);
-                                break;
-                        }
-                        distance--;
-                    }
-                }
-                animal.setXAfterMove(destinationPoint.getX());
-                animal.setYAfterMove(destinationPoint.getY());
-                System.out.println();
-            });
-            System.out.println();
+            movingAction(point, animals);
+            ArrayList<Plant> plants = getPlantsOnPoint(organisms);
+            growthAction(point, plants);
         }
-
-        move();
-
     }
 
-    private boolean isValidMove(Point point, Direction move) {
-        if (
-            (point.getX() == 0 && move == Direction.LEFT)
-            || (point.getX() == WIDTH - 1 && move == Direction.RIGHT)
-            || (point.getY() == 0 && move == Direction.DOWN)
-            || (point.getY() == HEIGHT - 1 && move == Direction.UP)) {
-            return false;
-        } else {
-            return true;
-        }
+    private void growthAction(Point point, ArrayList<Plant> plants) {
+        plants.forEach(plant -> {
+            plant.growth(point);
+        });
+    }
+
+    private void movingAction(Point point, ArrayList<Animal> animals) {
+        animals.forEach(animal -> {
+            animal.move(point);
+            System.out.println();
+        });
     }
 
     private void pairAction(ArrayList<Organism> organisms, ArrayList<Animal> animals) {
@@ -96,6 +68,13 @@ public class World {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    private ArrayList<Plant> getPlantsOnPoint(ArrayList<Organism> organisms) {
+        return organisms.stream()
+                .filter(currentOrganism -> currentOrganism instanceof Plant)
+                .map(currentOrganism -> (Plant) currentOrganism)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private ArrayList<Organism> cleanDeadOrganism(ArrayList<Organism> organismsOnPoint) {
         Iterator<Organism> iterator = organismsOnPoint.iterator();
         while (iterator.hasNext()) {
@@ -106,9 +85,4 @@ public class World {
         }
         return organismsOnPoint;
     }
-
-    private void move() {
-
-    }
-
 }
