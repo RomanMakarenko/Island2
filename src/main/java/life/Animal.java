@@ -9,7 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @Setter
@@ -38,5 +42,9 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
                 System.out.println("Missed chanceForLoot block");
             }
         }
+    }
+
+    public void eat() {
+
     }
 }
