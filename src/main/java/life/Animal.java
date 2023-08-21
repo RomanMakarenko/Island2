@@ -24,6 +24,8 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
     protected double eatenSize;
     protected boolean isPaired;
     protected int chanceForPairing;
+    protected int endurance;
+    private int DEFAULT_ENDURANCE;
 
     protected void loadConfig(String animalType) {
         ConfigurationManager configurationManager = new ConfigurationManager();
@@ -35,6 +37,8 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
             maxSpeed = classNode.get("maxSpeed").asInt();
             mealSize = classNode.get("mealSize").asDouble();
             chanceForPairing = classNode.get("chanceForPairing").asInt();
+            endurance = classNode.get("endurance").asInt();
+            DEFAULT_ENDURANCE = endurance;
             JsonNode chanceForLootNode = classNode.get("chanceForLoot");
             if (chanceForLootNode != null) {
                 chanceForLootNode.fields().forEachRemaining(entry -> {
@@ -54,13 +58,22 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         List<String> potentialFoodListInIteration = this.getPotentialIterationFoodList();
         potentialFoodListInIteration.stream().forEach(food -> {
             for (Organism organism : organismsOnPoint) {
-                if (organism.getORGANISM_TYPE().equals(food) && organism.isAlive()) {
+                if (organism.getORGANISM_TYPE().equals(food) && organism.isAlive() && this.getEatenSize() < this.getMealSize()) {
                     organism.setAlive(false);
-                    this.setEatenSize(organism.getWeight());
+                    if (this.getMealSize() < organism.getWeight()) {
+                        this.setEatenSize(this.getMealSize());
+                    } else {
+                        this.setEatenSize(this.getEatenSize() + organism.getWeight());
+                    }
+                    this.setEndurance(DEFAULT_ENDURANCE);
                     break;
                 }
             }
         });
+        this.setEndurance(this.getEndurance() - 1);
+        if (this.endurance < 0) {
+            this.setAlive(false);
+        }
         return organismsOnPoint;
     }
 
