@@ -4,6 +4,7 @@
   "maxSpeed": 2,
   "mealSize": 80.0,
   "chanceForPairing": 10,
+  "endurance": 3,
   "chanceForLoot": {
     "wolf": 0,
     "boa": 80,
