@@ -9,6 +9,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Data
 public abstract class Organism implements Dying {
     protected final String ORGANISM_TYPE = "Organism";
+    protected int xAfterMove;
+    protected int yAfterMove;
     protected boolean isAlive;
     protected double weight;
     protected int maxPopulationSize;
