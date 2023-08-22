@@ -17,31 +17,34 @@ public class World {
         islandMap = island.generateLifeOnIsland(WIDTH, HEIGHT);
     }
 
-    public void makeIteration() {
-        int animalsCountOnIteration = 0;
-        int organismsCountOnIteration = 0;
-        int numberOfEatenOrganismsOnIteration = 0;
-        int numberOfBornAnimalsOnIteration = 0;
-        for (Map.Entry<Point, ArrayList<Organism>> entry : islandMap.entrySet()) {
+    public void makeIteration() throws AllDeadException {
+        List<Thread> threads = new ArrayList<>();
+        Map<Point, ArrayList<Organism>> copyOfIslandMap = new HashMap<>(islandMap);
+        if (islandMap.size() == 0) {
+            throw new AllDeadException("Everyone is dead");
+        }
+        for (Map.Entry<Point, ArrayList<Organism>> entry : copyOfIslandMap.entrySet()) {
             Point point = entry.getKey();
             ArrayList<Organism> organisms = entry.getValue();
-            organismsCountOnIteration += organisms.size();
-            Collections.shuffle(organisms);
-            ArrayList<Animal> animals = getAnimalsOnPoint(organisms);
-            animalsCountOnIteration += animals.size();
-            int organismsCountBeforeEat = organisms.size();
-            eatAction(organisms, animals);
-            numberOfEatenOrganismsOnIteration += organismsCountBeforeEat - organisms.size();
-            animals = getAnimalsOnPoint(organisms);
-            pairAction(organisms, animals);
-            animals = getAnimalsOnPoint(organisms);
-            movingAction(point, animals);
-            ArrayList<Plant> plants = getPlantsOnPoint(organisms);
-            growthAction(point, plants);
+            Thread thread = new Thread(() -> {
+                Collections.shuffle(organisms);
+                ArrayList<Animal> animals = getAnimalsOnPoint(organisms);
+                eatAction(organisms, animals);
+                animals = getAnimalsOnPoint(organisms);
+                pairAction(organisms, animals);
+                animals = getAnimalsOnPoint(organisms);
+                movingAction(point, animals);
+                ArrayList<Plant> plants = getPlantsOnPoint(organisms);
+                growthAction(point, plants);
+            });
+            threads.add(thread);
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        System.out.println("Organisms count on iteration: " + organismsCountOnIteration);
-        System.out.println("Animals count on iteration: " + animalsCountOnIteration);
-        System.out.println("Number of eaten organisms on iteration: " + numberOfEatenOrganismsOnIteration);
         refreshMap();
     }
 
