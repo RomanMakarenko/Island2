@@ -3,6 +3,8 @@ package life.world;
 import life.Animal;
 import life.Organism;
 import life.Plant;
+import life.statistic.Statistic;
+import life.statistic.StatisticOnPoint;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,8 +19,9 @@ public class World {
         islandMap = island.generateLifeOnIsland(WIDTH, HEIGHT);
     }
 
-    public void makeIteration() throws AllDeadException {
+    public Statistic makeIteration() throws AllDeadException {
         List<Thread> threads = new ArrayList<>();
+        Statistic statistic = new Statistic();
         Map<Point, ArrayList<Organism>> copyOfIslandMap = new HashMap<>(islandMap);
         if (islandMap.size() == 0) {
             throw new AllDeadException("Everyone is dead");
@@ -27,15 +30,21 @@ public class World {
             Point point = entry.getKey();
             ArrayList<Organism> organisms = entry.getValue();
             Thread thread = new Thread(() -> {
+                StatisticOnPoint statisticOnPoint = new StatisticOnPoint();
+                statisticOnPoint.setNumberOfOrganismsOnStartOfIteration(organisms.size());
                 Collections.shuffle(organisms);
                 ArrayList<Animal> animals = getAnimalsOnPoint(organisms);
+                statisticOnPoint.setNumberOfAnimalsOnStartOfIteration(animals.size());
                 eatAction(organisms, animals);
+                statisticOnPoint.setNumberOfOrganismsAfterEat(organisms.size());
                 animals = getAnimalsOnPoint(organisms);
                 pairAction(organisms, animals);
+                statisticOnPoint.setNumberOfOrganismsAfterPair(organisms.size());
                 animals = getAnimalsOnPoint(organisms);
                 movingAction(point, animals);
                 ArrayList<Plant> plants = getPlantsOnPoint(organisms);
                 growthAction(point, plants);
+                statistic.addStatisticsOnPoint(statisticOnPoint);
             });
             threads.add(thread);
             thread.start();
@@ -46,6 +55,7 @@ public class World {
             }
         }
         refreshMap();
+        return statistic;
     }
 
     private void refreshMap() {
