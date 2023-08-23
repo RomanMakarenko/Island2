@@ -1,4 +1,5 @@
 import life.world.AllDeadException;
+import life.statistic.Statistic;
 import life.world.World;
 
 public class RunSimulation {
@@ -8,14 +9,13 @@ public class RunSimulation {
         while(true) {
             try {
                 iterationCounter++;
-                System.out.printf("Day number = d%", iterationCounter);
-                System.out.println("=============================================================");
-                world.makeIteration();
-                System.out.println("=============================================================");
+                System.out.printf("Day number = %d", iterationCounter);
+                System.out.println();
+                Statistic iterationStat = world.makeIteration();
+                iterationStat.printStatistic();
             } catch (AllDeadException e) {
                 System.out.println(e + " within " + iterationCounter + " days");
                 break;
-
             }
         }
     }
