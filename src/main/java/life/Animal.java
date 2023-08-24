@@ -108,14 +108,12 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
     }
 
     @Override
-    public void move(Point point) {
+    public void move() {
         if (this.getMaxSpeed() == 0) {
-            this.setXAfterMove(point.getX());
-            this.setYAfterMove(point.getY());
             return;
         }
         int distance = ThreadLocalRandom.current().nextInt(0, this.getMaxSpeed());
-        Point destinationPoint = new Point(point.getX(), point.getY());
+        Point destinationPoint = new Point(this.getXAfterMove(), this.getYAfterMove());
         while (distance > 0) {
             Direction currentDirection = Direction.getRandomDirection();
             if (isValidMove(destinationPoint, currentDirection)) {
