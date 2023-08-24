@@ -6,6 +6,7 @@ import life.behavior.Direction;
 import life.behavior.Eating;
 import life.behavior.Moving;
 import life.behavior.Pairing;
+import life.world.Island;
 import life.world.Point;
 import life.world.World;
 import lombok.EqualsAndHashCode;
@@ -53,17 +54,18 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
     }
 
     @Override
-    public ArrayList<Organism> eat(ArrayList<Organism> organismsOnPoint) {
-        Collections.shuffle(organismsOnPoint);
+    public void eat() {
+        organismsListOnTheSamePoint = Island.instance.getOrganismListOnPoint(new Point(xAfterMove, yAfterMove));
+        Collections.shuffle(organismsListOnTheSamePoint);
         List<String> potentialFoodListInIteration = this.getPotentialIterationFoodList();
         potentialFoodListInIteration.stream().forEach(food -> {
-            for (Organism organism : organismsOnPoint) {
+            for (Organism organism : organismsListOnTheSamePoint) {
                 if (organism.getORGANISM_TYPE().equals(food) && organism.isAlive() && this.getEatenSize() < this.getMealSize()) {
                     organism.setAlive(false);
                     if (this.getMealSize() < organism.getWeight()) {
                         this.setEatenSize(this.getMealSize());
                     } else {
-                        this.setEatenSize(this.getEatenSize() + organism.getWeight());
+                        this.setEatenSize(Math.min(this.getEatenSize() + organism.getWeight(), this.getMealSize()));
                     }
                     this.setEndurance(DEFAULT_ENDURANCE);
                     break;
@@ -74,7 +76,6 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         if (this.endurance < 0) {
             this.setAlive(false);
         }
-        return organismsOnPoint;
     }
 
     @Override

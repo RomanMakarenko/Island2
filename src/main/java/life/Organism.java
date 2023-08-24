@@ -15,6 +15,7 @@ public abstract class Organism implements Dying {
     protected double weight;
     protected int maxPopulationSize;
     protected HashMap<String, Integer> chanceForLoot = new HashMap<>();
+    protected ArrayList<Organism> organismsListOnTheSamePoint;
 
     public abstract Organism createClone();
 

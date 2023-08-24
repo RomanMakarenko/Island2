@@ -10,13 +10,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class World {
-    public static final int WIDTH = 100;
-    public static final int HEIGHT = 20;
+    public static final int WIDTH = 10;
+    public static final int HEIGHT = 10;
     private HashMap<Point, ArrayList<Organism>> islandMap;
 
     public World() {
-        Island island = new Island();
-        islandMap = island.generateLifeOnIsland(WIDTH, HEIGHT);
+        Island island = Island.getInstance(WIDTH, HEIGHT);
+        islandMap = island.getLifeOnIsland();
+        System.out.println();
     }
 
     public Statistic makeIteration() throws AllDeadException {
@@ -43,7 +44,7 @@ public class World {
                 animals = getAnimalsOnPoint(organisms);
                 movingAction(point, animals);
                 ArrayList<Plant> plants = getPlantsOnPoint(organisms);
-                growthAction(point, plants);
+                growthAction(organisms, point, plants);
                 statistic.addStatisticsOnPoint(statisticOnPoint);
             });
             threads.add(thread);
@@ -76,9 +77,10 @@ public class World {
         islandMap = newIslandMap;
     }
 
-    private void growthAction(Point point, ArrayList<Plant> plants) {
+    private void growthAction(ArrayList<Organism> organisms, Point point, ArrayList<Plant> plants) {
         plants.forEach(plant -> {
-            plant.growth(point);
+            ArrayList<Plant> newCreatedPlants = plant.growth(point, plants);
+            organisms.addAll(newCreatedPlants);
         });
     }
 
@@ -98,7 +100,7 @@ public class World {
 
     private void eatAction(ArrayList<Organism> organisms, ArrayList<Animal> animals) {
         animals.forEach(animal -> {
-            animal.eat(organisms);
+            animal.eat();
         });
         cleanDeadOrganism(organisms);
     }

@@ -27,7 +27,6 @@ public class DataCollector {
         List<Organism> organismList = new ArrayList<>();
         List<Class<?>> allClasses = getAllLife();
         for (Class<?> clazz : allClasses) {
-            System.out.println(clazz.getSimpleName());
             Object object = null;
             try {
                 object = clazz.newInstance();
