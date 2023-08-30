@@ -55,7 +55,7 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
 
     @Override
     public void eat() {
-        organismsListOnTheSamePoint = Island.instance.getOrganismListOnPoint(new Point(xAfterMove, yAfterMove));
+        organismsListOnTheSamePoint = Island.instance.getOrganismListOnPoint(new Point(x, y));
         Collections.shuffle(organismsListOnTheSamePoint);
         List<String> potentialFoodListInIteration = this.getPotentialIterationFoodList();
         potentialFoodListInIteration.stream().forEach(food -> {
