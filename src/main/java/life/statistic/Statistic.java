@@ -53,7 +53,7 @@ public class Statistic {
         System.out.println("Number of animals on start of the iteration = " + this.getFullNumberOfAnimalsOnStartOfIteration());
         System.out.println("Number of plants on start of the iteration = " + this.getFullNumberOfPlantsOnStartOfIteration());
         System.out.println("Number of organisms after eat = " + this.getFullNumberOfOrganismsAfterEat());
-        System.out.println("Number of born organisms = " + this.getFullNumberOfBornOrganisms());
+        System.out.println("Number of born animals = " + this.getFullNumberOfBornOrganisms());
         System.out.println("=============================================================");
     }
 }
