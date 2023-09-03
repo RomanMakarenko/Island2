@@ -10,71 +10,40 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class World {
-    public static final int WIDTH = 10;
-    public static final int HEIGHT = 10;
-    private HashMap<Point, ArrayList<Organism>> islandMap;
+    public static final int WIDTH = 2;
+    public static final int HEIGHT = 3;
+    private Island island;
 
     public World() {
-        Island island = Island.getInstance(WIDTH, HEIGHT);
-        islandMap = island.getLifeOnIsland();
-        System.out.println();
+        island = Island.getInstance(WIDTH, HEIGHT);
     }
 
     public Statistic makeIteration() throws AllDeadException {
-        List<Thread> threads = new ArrayList<>();
         Statistic statistic = new Statistic();
-        Map<Point, ArrayList<Organism>> copyOfIslandMap = new HashMap<>(islandMap);
+        HashMap<Point, ArrayList<Organism>> islandMap = island.getLifeOnIsland();
         if (islandMap.size() == 0) {
             throw new AllDeadException("Everyone is dead");
         }
-        for (Map.Entry<Point, ArrayList<Organism>> entry : copyOfIslandMap.entrySet()) {
+        for (Map.Entry<Point, ArrayList<Organism>> entry : islandMap.entrySet()) {
             Point point = entry.getKey();
             ArrayList<Organism> organisms = entry.getValue();
-            Thread thread = new Thread(() -> {
-                StatisticOnPoint statisticOnPoint = new StatisticOnPoint();
-                statisticOnPoint.setNumberOfOrganismsOnStartOfIteration(organisms.size());
-                Collections.shuffle(organisms);
-                ArrayList<Animal> animals = getAnimalsOnPoint(organisms);
-                statisticOnPoint.setNumberOfAnimalsOnStartOfIteration(animals.size());
-                eatAction(organisms, animals);
-                statisticOnPoint.setNumberOfOrganismsAfterEat(organisms.size());
-                animals = getAnimalsOnPoint(organisms);
-                pairAction(organisms, animals);
-                statisticOnPoint.setNumberOfOrganismsAfterPair(organisms.size());
-                animals = getAnimalsOnPoint(organisms);
-                movingAction(point, animals);
-                ArrayList<Plant> plants = getPlantsOnPoint(organisms);
-                growthAction(organisms, point, plants);
-                statistic.addStatisticsOnPoint(statisticOnPoint);
-            });
-            threads.add(thread);
-            thread.start();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            StatisticOnPoint statisticOnPoint = new StatisticOnPoint();
+            statisticOnPoint.setNumberOfOrganismsOnStartOfIteration(organisms.size());
+            Collections.shuffle(organisms);
+            ArrayList<Animal> animals = getAnimalsOnPoint(organisms);
+            statisticOnPoint.setNumberOfAnimalsOnStartOfIteration(animals.size());
+            eatAction(animals);
+            island.cleanDeadOrganism(point);
+            statisticOnPoint.setNumberOfOrganismsAfterEat(organisms.size());
+            animals = getAnimalsOnPoint(organisms);
+            pairAction(animals);
+            statisticOnPoint.setNumberOfOrganismsAfterPair(organisms.size());
+            animals = getAnimalsOnPoint(organisms);
+            movingAction(animals);
+            statistic.addStatisticsOnPoint(statisticOnPoint);
         }
-        refreshMap();
+        island.refreshMap();
         return statistic;
-    }
-
-    private void refreshMap() {
-        HashMap<Point, ArrayList<Organism>> newIslandMap = new HashMap<>();
-        for (Map.Entry<Point, ArrayList<Organism>> entry : islandMap.entrySet()) {
-            ArrayList<Organism> organisms = entry.getValue();
-            for (Organism organism : organisms) {
-                Point newKey = new Point(organism.getXAfterMove(), organism.getYAfterMove());
-                if (newIslandMap.containsKey(newKey)) {
-                    newIslandMap.get(newKey).add(organism);
-                } else {
-                    ArrayList<Organism> newOrganismList = new ArrayList<>();
-                    newOrganismList.add(organism);
-                    newIslandMap.put(newKey, newOrganismList);
-                }
-            }
-        }
-        islandMap = newIslandMap;
     }
 
     private void growthAction(ArrayList<Organism> organisms, Point point, ArrayList<Plant> plants) {
@@ -84,25 +53,22 @@ public class World {
         });
     }
 
-    private void movingAction(Point point, ArrayList<Animal> animals) {
+    private void movingAction(ArrayList<Animal> animals) {
         animals.forEach(animal -> {
-            animal.move(point);
+            animal.move();
         });
     }
 
-    private void pairAction(ArrayList<Organism> organisms, ArrayList<Animal> animals) {
+    private void pairAction(ArrayList<Animal> animals) {
         animals.forEach(animal -> {
-            animal.pair(animals);
-            ArrayList<Animal> newCreatedAnimals = animal.pair(animals);
-            organisms.addAll(newCreatedAnimals);
+            animal.pair();
         });
     }
 
-    private void eatAction(ArrayList<Organism> organisms, ArrayList<Animal> animals) {
+    private void eatAction(ArrayList<Animal> animals) {
         animals.forEach(animal -> {
             animal.eat();
         });
-        cleanDeadOrganism(organisms);
     }
 
     private ArrayList<Animal> getAnimalsOnPoint(ArrayList<Organism> organisms) {
@@ -119,14 +85,24 @@ public class World {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private ArrayList<Organism> cleanDeadOrganism(ArrayList<Organism> organismsOnPoint) {
+//    private void cleanDeadOrganism(Point point) {
+//        Iterator<Organism> iterator = islandMap.get(point).iterator();
+//        while (iterator.hasNext()) {
+//            Organism organism = iterator.next();
+//            if (!organism.isAlive()) {
+//                iterator.remove();
+//            }
+//        }
+//    }
+
+    private boolean isContainsDeadOrganism(ArrayList<Organism> organismsOnPoint) {
         Iterator<Organism> iterator = organismsOnPoint.iterator();
         while (iterator.hasNext()) {
             Organism organism = iterator.next();
             if (!organism.isAlive()) {
-                iterator.remove();
+                return true;
             }
         }
-        return organismsOnPoint;
+        return false;
     }
 }
