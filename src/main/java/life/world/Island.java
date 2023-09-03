@@ -3,9 +3,8 @@ package life.world;
 import dataManager.DataCollector;
 import life.Animal;
 import life.Organism;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,7 @@ public class Island {
         if (result != null) {
             return result;
         }
-        synchronized(Island.class) {
+        synchronized (Island.class) {
             if (instance == null) {
                 instance = new Island(worldWidth, worldHeight);
                 lifeOnIsland = instance.generateLifeOnIsland();
@@ -50,8 +49,8 @@ public class Island {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public void addAnimalsOnPoint(ArrayList<Animal> bornAnimals, Point point) {
-        lifeOnIsland.get(point).addAll(bornAnimals);
+    public void addOrganismsOnPoint(ArrayList<? extends Organism> organisms, Point point) {
+        lifeOnIsland.get(point).addAll(organisms);
     }
 
     private HashMap<Point, ArrayList<Organism>> generateLifeOnIsland() {
@@ -62,13 +61,15 @@ public class Island {
             for (int j = 0; j < worldHeight; j++) {
                 Point currentPoint = new Point(i, j);
                 ArrayList<Organism> organismsAtPoint = new ArrayList<>();
-                for (Organism organism: organismList) {
-                   int organismPopulationOnPoint = ThreadLocalRandom.current().nextInt(
-                           MIN_ORGANISM_POPULATION,
-                           organism.getMaxPopulationSize()
-                   );
+                for (Organism organism : organismList) {
+                    int organismPopulationOnPoint = ThreadLocalRandom.current().nextInt(
+                            MIN_ORGANISM_POPULATION,
+                            organism.getMaxPopulationSize()
+                    );
                     for (int k = 0; k < organismPopulationOnPoint; k++) {
                         Organism newOrganism = organism.createClone();
+                        newOrganism.setX(i);
+                        newOrganism.setY(j);
                         newOrganism.setXAfterMove(i);
                         newOrganism.setYAfterMove(j);
                         organismsAtPoint.add(newOrganism);
@@ -78,6 +79,42 @@ public class Island {
             }
         }
         return lifeOnIsland;
+    }
+
+    public void refreshMap() {
+        HashMap<Point, ArrayList<Organism>> newIslandMap = new HashMap<>();
+        for (Map.Entry<Point, ArrayList<Organism>> entry : lifeOnIsland.entrySet()) {
+            ArrayList<Organism> organisms = entry.getValue();
+            for (Organism organism : organisms) {
+                if (!organism.isAlive()) {
+                    continue;
+                }
+                if (organism instanceof Animal) {
+                    ((Animal) organism).setPaired(false);
+                }
+                Point newKey = new Point(organism.getXAfterMove(), organism.getYAfterMove());
+                if (newIslandMap.containsKey(newKey)) {
+                    organism.setX(organism.getXAfterMove());
+                    organism.setY(organism.getYAfterMove());
+                    newIslandMap.get(newKey).add(organism);
+                } else {
+                    ArrayList<Organism> newOrganismList = new ArrayList<>();
+                    newOrganismList.add(organism);
+                    newIslandMap.put(newKey, newOrganismList);
+                }
+            }
+        }
+        lifeOnIsland = newIslandMap;
+    }
+
+    public void cleanDeadOrganism(Point point) {
+        Iterator<Organism> iterator = lifeOnIsland.get(point).iterator();
+        while (iterator.hasNext()) {
+            Organism organism = iterator.next();
+            if (!organism.isAlive()) {
+                iterator.remove();
+            }
+        }
     }
 }
 

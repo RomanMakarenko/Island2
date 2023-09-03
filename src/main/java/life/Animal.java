@@ -79,10 +79,12 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
     }
 
     @Override
-    public ArrayList<Animal> pair(ArrayList<Animal> animalsOnPoint) {
+    public void pair() {
         if (this.isPaired() || !this.wantToPairing()) {
-            return new ArrayList<>();
+            return;
         }
+        Point currentPoint = new Point(this.getX(), this.getY());
+        ArrayList<Animal> animalsOnPoint = Island.instance.getAnimalsOnPoint(currentPoint);
         Collections.shuffle(animalsOnPoint);
         ArrayList<Animal> newCreatedAnimals = new ArrayList<>();
         animalsOnPoint.forEach(comparedAnimal -> {
@@ -94,10 +96,13 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
             ) {
                 this.setPaired(true);
                 comparedAnimal.setPaired(true);
-                newCreatedAnimals.add((Animal) this.createClone());
+                Organism newOrganism = this.createClone();
+                newOrganism.setX(this.getX());
+                newOrganism.setY(this.getY());
+                newCreatedAnimals.add((Animal) newOrganism);
             }
         });
-        return newCreatedAnimals;
+        Island.instance.addOrganismsOnPoint(newCreatedAnimals, currentPoint);
     }
 
     private boolean wantToPairing() {
@@ -112,8 +117,8 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         if (this.getMaxSpeed() == 0) {
             return;
         }
+        Point destinationPoint = new Point(this.getX(), this.getY());
         int distance = ThreadLocalRandom.current().nextInt(0, this.getMaxSpeed());
-        Point destinationPoint = new Point(this.getXAfterMove(), this.getYAfterMove());
         while (distance > 0) {
             Direction currentDirection = Direction.getRandomDirection();
             if (isValidMove(destinationPoint, currentDirection)) {
