@@ -3,6 +3,7 @@ package life;
 import com.fasterxml.jackson.databind.JsonNode;
 import dataManager.ConfigurationManager;
 import life.behavior.Growth;
+import life.world.Island;
 import life.world.Point;
 
 import java.util.ArrayList;
@@ -20,9 +21,9 @@ public abstract class Plant extends Organism implements Growth {
     }
 
     @Override
-    public ArrayList<Plant> growth(Point point, ArrayList<Plant> plantsOnPoint) {
-        this.setXAfterMove(point.getX());
-        this.setYAfterMove(point.getY());
+    public void growth() {
+        Point currentPoint = new Point(this.getX(), this.getY());
+        ArrayList<Plant> plantsOnPoint = Island.instance.getPlantsOnPoint(currentPoint);
         ArrayList<Plant> newCreatedPlants = new ArrayList<>();
         if (plantsOnPoint.size() < this.maxPopulationSize) {
             int numberOfNewPlantsOnPoint = ThreadLocalRandom.current().nextInt(
@@ -30,9 +31,12 @@ public abstract class Plant extends Organism implements Growth {
                     this.maxPopulationSize
             );
             for (int i = 0; i < numberOfNewPlantsOnPoint; i++) {
-                newCreatedPlants.add((Plant) this.createClone());
+                Organism newOrganism = this.createClone();
+                newOrganism.setX(this.getX());
+                newOrganism.setY(this.getY());
+                newCreatedPlants.add((Plant) newOrganism);
             }
         }
-        return newCreatedPlants;
+        Island.instance.addOrganismsOnPoint(newCreatedPlants, currentPoint);
     }
 }

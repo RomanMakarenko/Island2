@@ -3,6 +3,7 @@ package life.world;
 import dataManager.DataCollector;
 import life.Animal;
 import life.Organism;
+import life.Plant;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -46,6 +47,13 @@ public class Island {
         return lifeOnIsland.get(point).stream()
                 .filter(currentOrganism -> currentOrganism instanceof Animal)
                 .map(currentOrganism -> (Animal) currentOrganism)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<Plant> getPlantsOnPoint(Point point) {
+        return lifeOnIsland.get(point).stream()
+                .filter(currentOrganism -> currentOrganism instanceof Plant)
+                .map(currentOrganism -> (Plant) currentOrganism)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
