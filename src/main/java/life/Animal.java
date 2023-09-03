@@ -15,6 +15,7 @@ import lombok.Setter;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -85,6 +86,11 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         }
         Point currentPoint = new Point(this.getX(), this.getY());
         ArrayList<Animal> animalsOnPoint = Island.instance.getAnimalsOnPoint(currentPoint);
+        int animalPopulationNumber = (int) animalsOnPoint.stream()
+                .filter(animal -> animal.getORGANISM_TYPE().equals(this.getORGANISM_TYPE())).count();
+        if (animalPopulationNumber >= this.getMaxPopulationSize()) {
+            return;
+        }
         Collections.shuffle(animalsOnPoint);
         ArrayList<Animal> newCreatedAnimals = new ArrayList<>();
         animalsOnPoint.forEach(comparedAnimal -> {
@@ -109,7 +115,7 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         return ThreadLocalRandom.current().nextInt(
                 0,
                 100
-        ) <= this.getChanceForPairing();
+        ) <= this.getChanceForPairing()/5;
     }
 
     @Override

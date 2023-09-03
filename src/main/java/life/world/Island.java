@@ -40,6 +40,10 @@ public class Island {
     }
 
     public ArrayList<Organism> getOrganismListOnPoint(Point point) {
+        ArrayList<Organism> lifeOnPoint = lifeOnIsland.get(point);
+        if (lifeOnPoint == null) {
+            return new ArrayList<>();
+        }
         return lifeOnIsland.get(point);
     }
 
