@@ -86,6 +86,9 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         }
         Point currentPoint = new Point(this.getX(), this.getY());
         ArrayList<Animal> animalsOnPoint = Island.instance.getAnimalsOnPoint(currentPoint);
+        if (animalsOnPoint.size() == 0) {
+            return;
+        }
         int animalPopulationNumber = (int) animalsOnPoint.stream()
                 .filter(animal -> animal.getORGANISM_TYPE().equals(this.getORGANISM_TYPE())).count();
         if (animalPopulationNumber >= this.getMaxPopulationSize()) {
@@ -115,7 +118,7 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         return ThreadLocalRandom.current().nextInt(
                 0,
                 100
-        ) <= this.getChanceForPairing()/5;
+        ) <= this.getChanceForPairing()/4;
     }
 
     @Override
