@@ -79,7 +79,7 @@ public class World {
     }
 
     public void makePlantsActions() {
-
+        System.out.println();
     }
 
     private void growthAction(ArrayList<Plant> plants) {
