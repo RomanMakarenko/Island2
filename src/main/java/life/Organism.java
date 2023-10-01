@@ -11,10 +11,13 @@ public abstract class Organism implements Dying {
     protected final String ORGANISM_TYPE = "Organism";
     protected int xAfterMove;
     protected int yAfterMove;
+    protected int x;
+    protected int y;
     protected boolean isAlive;
     protected double weight;
     protected int maxPopulationSize;
     protected HashMap<String, Integer> chanceForLoot = new HashMap<>();
+    protected ArrayList<Organism> organismsListOnTheSamePoint;
 
     public abstract Organism createClone();
 

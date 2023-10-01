@@ -6,6 +6,7 @@ import life.behavior.Direction;
 import life.behavior.Eating;
 import life.behavior.Moving;
 import life.behavior.Pairing;
+import life.world.Island;
 import life.world.Point;
 import life.world.World;
 import lombok.EqualsAndHashCode;
@@ -14,6 +15,7 @@ import lombok.Setter;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -53,17 +55,18 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
     }
 
     @Override
-    public ArrayList<Organism> eat(ArrayList<Organism> organismsOnPoint) {
-        Collections.shuffle(organismsOnPoint);
+    public void eat() {
+        organismsListOnTheSamePoint = Island.instance.getOrganismListOnPoint(new Point(x, y));
+        Collections.shuffle(organismsListOnTheSamePoint);
         List<String> potentialFoodListInIteration = this.getPotentialIterationFoodList();
         potentialFoodListInIteration.stream().forEach(food -> {
-            for (Organism organism : organismsOnPoint) {
+            for (Organism organism : organismsListOnTheSamePoint) {
                 if (organism.getORGANISM_TYPE().equals(food) && organism.isAlive() && this.getEatenSize() < this.getMealSize()) {
                     organism.setAlive(false);
                     if (this.getMealSize() < organism.getWeight()) {
                         this.setEatenSize(this.getMealSize());
                     } else {
-                        this.setEatenSize(this.getEatenSize() + organism.getWeight());
+                        this.setEatenSize(Math.min(this.getEatenSize() + organism.getWeight(), this.getMealSize()));
                     }
                     this.setEndurance(DEFAULT_ENDURANCE);
                     break;
@@ -74,13 +77,19 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
         if (this.endurance < 0) {
             this.setAlive(false);
         }
-        return organismsOnPoint;
     }
 
     @Override
-    public ArrayList<Animal> pair(ArrayList<Animal> animalsOnPoint) {
+    public void pair() {
         if (this.isPaired() || !this.wantToPairing()) {
-            return new ArrayList<>();
+            return;
+        }
+        Point currentPoint = new Point(this.getX(), this.getY());
+        ArrayList<Animal> animalsOnPoint = Island.instance.getAnimalsOnPoint(currentPoint);
+        int animalPopulationNumber = (int) animalsOnPoint.stream()
+                .filter(animal -> animal.getORGANISM_TYPE().equals(this.getORGANISM_TYPE())).count();
+        if (animalPopulationNumber >= this.getMaxPopulationSize()) {
+            return;
         }
         Collections.shuffle(animalsOnPoint);
         ArrayList<Animal> newCreatedAnimals = new ArrayList<>();
@@ -93,28 +102,29 @@ public abstract class Animal extends Organism implements Eating, Moving, Pairing
             ) {
                 this.setPaired(true);
                 comparedAnimal.setPaired(true);
-                newCreatedAnimals.add((Animal) this.createClone());
+                Organism newOrganism = this.createClone();
+                newOrganism.setX(this.getX());
+                newOrganism.setY(this.getY());
+                newCreatedAnimals.add((Animal) newOrganism);
             }
         });
-        return newCreatedAnimals;
+        Island.instance.addOrganismsOnPoint(newCreatedAnimals, currentPoint);
     }
 
     private boolean wantToPairing() {
         return ThreadLocalRandom.current().nextInt(
                 0,
                 100
-        ) <= this.getChanceForPairing();
+        ) <= this.getChanceForPairing()/5;
     }
 
     @Override
-    public void move(Point point) {
+    public void move() {
         if (this.getMaxSpeed() == 0) {
-            this.setXAfterMove(point.getX());
-            this.setYAfterMove(point.getY());
             return;
         }
+        Point destinationPoint = new Point(this.getX(), this.getY());
         int distance = ThreadLocalRandom.current().nextInt(0, this.getMaxSpeed());
-        Point destinationPoint = new Point(point.getX(), point.getY());
         while (distance > 0) {
             Direction currentDirection = Direction.getRandomDirection();
             if (isValidMove(destinationPoint, currentDirection)) {

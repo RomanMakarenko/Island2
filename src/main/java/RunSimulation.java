@@ -13,6 +13,9 @@ public class RunSimulation {
                 System.out.println();
                 Statistic iterationStat = world.makeIteration();
                 iterationStat.printStatistic();
+                if (iterationStat.getFullNumberOfAnimalsOnStartOfIteration() == 0) {
+                    throw new AllDeadException("All animals are dead");
+                }
             } catch (AllDeadException e) {
                 System.out.println(e + " within " + iterationCounter + " days");
                 break;

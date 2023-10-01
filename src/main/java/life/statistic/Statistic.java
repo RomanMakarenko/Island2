@@ -25,10 +25,14 @@ public class Statistic {
                 .sum();
     }
 
-    private int getFullNumberOfAnimalsOnStartOfIteration() {
+    public int getFullNumberOfAnimalsOnStartOfIteration() {
         return mapStatistic.stream()
                 .mapToInt(StatisticOnPoint::getNumberOfAnimalsOnStartOfIteration)
                 .sum();
+    }
+
+    private int getFullNumberOfPlantsOnStartOfIteration() {
+        return this.getFullNumberOfOrganismsOnStartOfIteration() - this.getFullNumberOfAnimalsOnStartOfIteration();
     }
 
     private int getFullNumberOfOrganismsAfterEat() {
@@ -46,9 +50,10 @@ public class Statistic {
     public void printStatistic() {
         System.out.println("=============================================================");
         System.out.println("Number of organisms on start of the iteration = " + this.getFullNumberOfOrganismsOnStartOfIteration());
-        System.out.println("Number of animals on end start the iteration = " + this.getFullNumberOfAnimalsOnStartOfIteration());
+        System.out.println("Number of animals on start of the iteration = " + this.getFullNumberOfAnimalsOnStartOfIteration());
+        System.out.println("Number of plants on start of the iteration = " + this.getFullNumberOfPlantsOnStartOfIteration());
         System.out.println("Number of organisms after eat = " + this.getFullNumberOfOrganismsAfterEat());
-        System.out.println("Number of born organisms = " + this.getFullNumberOfBornOrganisms());
+        System.out.println("Number of born animals = " + this.getFullNumberOfBornOrganisms());
         System.out.println("=============================================================");
     }
 }
