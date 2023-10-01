@@ -20,7 +20,7 @@ public class RunSimulation {
                 System.out.println(e + " within " + iterationCounter + " days");
                 break;
             } catch (Exception e) {
-                System.out.println("In simulation left only one kind of organism type " + iterationCounter + " days");
+                System.out.println("In simulation left only 1 kind of organism type " + iterationCounter + " days");
                 break;
             }
         }
