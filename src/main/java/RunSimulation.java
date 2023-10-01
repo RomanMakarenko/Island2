@@ -19,6 +19,9 @@ public class RunSimulation {
             } catch (AllDeadException e) {
                 System.out.println(e + " within " + iterationCounter + " days");
                 break;
+            } catch (Exception e) {
+                System.out.println("In simulation left only one kind of organism type " + iterationCounter + " days");
+                break;
             }
         }
     }
