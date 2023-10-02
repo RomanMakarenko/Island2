@@ -48,6 +48,9 @@ public class Island {
     }
 
     public ArrayList<Animal> getAnimalsOnPoint(Point point) {
+        if (lifeOnIsland.get(point) == null) {
+            return new ArrayList<>();
+        }
         return lifeOnIsland.get(point).stream()
                 .filter(currentOrganism -> currentOrganism instanceof Animal)
                 .map(currentOrganism -> (Animal) currentOrganism)
@@ -55,6 +58,9 @@ public class Island {
     }
 
     public ArrayList<Plant> getPlantsOnPoint(Point point) {
+        if (lifeOnIsland.get(point) == null) {
+            return new ArrayList<>();
+        }
         return lifeOnIsland.get(point).stream()
                 .filter(currentOrganism -> currentOrganism instanceof Plant)
                 .map(currentOrganism -> (Plant) currentOrganism)
