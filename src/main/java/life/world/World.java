@@ -9,20 +9,18 @@ import life.statistic.StatisticOnPoint;
 import java.util.*;
 
 public class World {
-    public static final int WIDTH = 2;
+    public static final int WIDTH = 3;
     public static final int HEIGHT = 3;
     private Island island;
+    public int iterationCounter = 0;
 
     public World() {
         island = Island.getInstance(WIDTH, HEIGHT);
     }
 
-    public Statistic makeIteration() throws AllDeadException {
+    public Statistic makeIteration() {
         Statistic statistic = new Statistic();
         HashMap<Point, ArrayList<Organism>> islandMap = island.getLifeOnIsland();
-        if (islandMap.size() == 0) {
-            throw new AllDeadException("Everyone is dead");
-        }
         for (Map.Entry<Point, ArrayList<Organism>> entry : islandMap.entrySet()) {
             Point point = entry.getKey();
             ArrayList<Organism> organisms = entry.getValue();
@@ -39,12 +37,20 @@ public class World {
             statisticOnPoint.setNumberOfOrganismsAfterPair(organisms.size());
             animals = island.getAnimalsOnPoint(point);
             movingAction(animals);
-            ArrayList<Plant> plants = island.getPlantsOnPoint(point);
-            growthAction(plants);
             statistic.addStatisticsOnPoint(statisticOnPoint);
         }
         island.refreshMap();
+        iterationCounter++;
         return statistic;
+    }
+
+    public void makePlantsActions() {
+        HashMap<Point, ArrayList<Organism>> islandMap = island.getLifeOnIsland();
+        for (Map.Entry<Point, ArrayList<Organism>> entry : islandMap.entrySet()) {
+            Point point = entry.getKey();
+            ArrayList<Plant> plants = island.getPlantsOnPoint(point);
+            growthAction(plants);
+        }
     }
 
     private void growthAction(ArrayList<Plant> plants) {
@@ -66,8 +72,13 @@ public class World {
     }
 
     private void eatAction(ArrayList<Animal> animals) {
-        animals.forEach(animal -> {
+        Iterator<Animal> iterator = animals.iterator();
+        while (iterator.hasNext()) {
+            Animal animal = iterator.next();
             animal.eat();
-        });
+            if (animal.isAlive()) {
+                iterator.remove();
+            }
+        }
     }
 }
